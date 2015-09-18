@@ -1,4 +1,4 @@
-package APIs;
+package Utilities;
 
 import java.io.IOException;
 import org.apache.http.HttpResponse;
@@ -22,6 +22,7 @@ public class HttpFactory {
 	HttpGet get;
 	String apiKey;
 	Integer responseCode;
+	String json_string;
 
 	public void sendPostRequest(String service, JSONObject json)
 			throws ClientProtocolException, IOException {
@@ -34,11 +35,10 @@ public class HttpFactory {
 		se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
 		post.setEntity(se);
 		response = client.execute(post);
-		String json_string;
-		json_string = EntityUtils.toString(response.getEntity());
+		setJson_string(EntityUtils.toString(response.getEntity()));
 		setResponseCode(response.getStatusLine().getStatusCode());
 		if (getResponseCode() == 200 && service.equals("login")) {
-			json = new JSONObject(json_string);
+			json = new JSONObject(getJson_string());
 			setApiKey(json.getString("authToken"));
 		}
 		else {
@@ -46,6 +46,20 @@ public class HttpFactory {
 		}
 
 	}
+	
+	public void sendGetRequest(String service, String authToken) throws ClientProtocolException, IOException {
+		String url = System.getProperty("apiUrl") + "/" + service;
+		client = new DefaultHttpClient();
+		get = new HttpGet(url);
+		get.addHeader("content-type", "application/json");
+		get.addHeader("Authorization", "Bearer " + authToken);
+		response = client.execute(get);
+		setResponseCode(response.getStatusLine().getStatusCode());
+		if(getResponseCode() == 200) {
+			setJson_string(EntityUtils.toString(response.getEntity()));
+		}
+	}
+		
 
 	public String getApiKey() {
 		return apiKey;
@@ -61,6 +75,14 @@ public class HttpFactory {
 
 	public void setResponseCode(Integer responseCode) {
 		this.responseCode = responseCode;
+	}
+	
+	public String getJson_string() {
+		return json_string;
+	}
+
+	public void setJson_string(String json_string) {
+		this.json_string = json_string;
 	}
 
 }
