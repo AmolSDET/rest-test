@@ -20,16 +20,20 @@ public class LoginAPI extends HttpFactory {
 		json.put("emailAddress", emailAddress);
 		json.put("password", password);
 		sendPostRequest("login", json);
-		LOG.info("API KEY:-" + getApiKey());
+		LOG.info("API KEY:-" + getAuthToken());
 		LOG.info("RESPONSE CODE:- " + getResponseCode());
 		if(user.toLowerCase().equals("valid")) {
-			Assert.assertTrue("API KEY IS NOT GENERATED", !getApiKey().equals("NOT GENERATED"));
+			Assert.assertTrue("API KEY IS NOT GENERATED", !getAuthToken().equals("NOT GENERATED"));
 			Assert.assertTrue("RESPONSE CODE IS NOT CORRECT", getResponseCode() == 200);
 		}
 		else if(user.toLowerCase().equals("invalid")){
-			Assert.assertTrue("API KEY IS GENERATED", getApiKey().equals("NOT GENERATED"));
+			Assert.assertTrue("API KEY IS GENERATED", getAuthToken().equals("NOT GENERATED"));
 			Assert.assertTrue("API KEY IS NOT CORRECT", getResponseCode() == 401);
 		}
+	}
+	
+	public void sendDeleteRequest(String authToken) throws ClientProtocolException, IOException {
+		sendDeleteRequest("delete", authToken);
 	}
 
 }
